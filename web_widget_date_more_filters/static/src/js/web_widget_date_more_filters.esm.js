@@ -109,28 +109,28 @@ export function getMinusParams(selectedOptionIds) {
     const selectedOptions = [];
     for (const optionId of selectedOptionIds) {
         const option = CUSTOM_PERIOD_OPTIONS[optionId];
-        if (option?.minusParams) {
+        if (option && option.minusParams) {
             selectedOptions.push(option.minusParams);
         }
     }
     return selectedOptions;
 }
 
-export function customGetSetParam(periodOption, referenceMoment) {
+export function customGetSetParam(periodOption, refMoment) {
     if (periodOption.granularity === "quarter") {
         return periodOption.setParam;
     }
-    const date = referenceMoment.plus(periodOption.plusParam);
+    const date = refMoment.plus(periodOption.plusParam);
     const granularity = periodOption.granularity;
     const setParam = {[granularity]: date[granularity]};
     return setParam;
 }
 
-export function customGetSelectedOptions(referenceMoment, selectedOptionIds) {
+export function customGetSelectedOptions(refMoment, selectedOptionIds) {
     const selectedOptions = {year: []};
     for (const optionId of selectedOptionIds) {
         const option = CUSTOM_PERIOD_OPTIONS[optionId];
-        const setParam = customGetSetParam(option, referenceMoment);
+        const setParam = customGetSetParam(option, refMoment);
         const granularity = option.granularity;
         if (!selectedOptions[granularity]) {
             selectedOptions[granularity] = [];
@@ -141,15 +141,12 @@ export function customGetSelectedOptions(referenceMoment, selectedOptionIds) {
 }
 
 export function customGetComparisonParams(
-    referenceMoment,
+    refMoment,
     selectedOptionIds,
     comparisonOptionId
 ) {
     const comparisonOption = COMPARISON_OPTIONS[comparisonOptionId];
-    const selectedOptions = customGetSelectedOptions(
-        referenceMoment,
-        selectedOptionIds
-    );
+    const selectedOptions = customGetSelectedOptions(refMoment, selectedOptionIds);
     if (comparisonOption.plusParam) {
         return [comparisonOption.plusParam, selectedOptions];
     }
@@ -205,7 +202,7 @@ export function customGetComparisonParams(
 
 export function customConstructDateRange(params) {
     const {
-        referenceMoment,
+        referenceMoment: refMoment,
         fieldName,
         fieldType,
         granularity,
@@ -220,9 +217,9 @@ export function customConstructDateRange(params) {
         delete setParam.quarter;
     }
 
-    const globalMinus = minusParams?.[0]?.global;
-    const leftDateMinus = minusParams?.[0]?.leftDate;
-    const date = referenceMoment
+    const globalMinus = minusParams && minusParams[0] && minusParams[0].global;
+    const leftDateMinus = minusParams && minusParams[0] && minusParams[0].leftDate;
+    const date = refMoment
         .set(setParam)
         .plus(plusParam || {})
         .minus(globalMinus || {});
@@ -252,9 +249,13 @@ export function customConstructDateRange(params) {
 
     if (granularity === "day") {
         let description = null;
-        const leftMinusDays = minusParams?.[0]?.leftDate?.days;
-        const isToday = referenceMoment.day === date.day;
-        const isYesterday = referenceMoment.day - 1 === date.day;
+        const leftMinusDays =
+            minusParams &&
+            minusParams[0] &&
+            minusParams[0].leftDate &&
+            minusParams[0].leftDate.days;
+        const isToday = refMoment.day === date.day;
+        const isYesterday = refMoment.day - 1 === date.day;
 
         if (comparisonOptionId && leftMinusDays) {
             description = `${_lt("From Date")} ${leftDate.toFormat(
@@ -278,7 +279,7 @@ export function customConstructDateRange(params) {
                 "yyyy"
             )}`;
         } else {
-            const isThisWeek = referenceMoment.weekNumber === date.weekNumber;
+            const isThisWeek = refMoment.weekNumber === date.weekNumber;
             description = isThisWeek ? _lt("This week") : _lt("Last week");
         }
 
@@ -295,7 +296,7 @@ export function customConstructDateRange(params) {
 }
 
 export function customConstructDateDomain(
-    referenceMoment,
+    refMoment,
     fieldName,
     fieldType,
     selectedOptionIds,
@@ -305,12 +306,12 @@ export function customConstructDateDomain(
     let selectedOptions = null;
     if (comparisonOptionId) {
         [plusParam, selectedOptions] = customGetComparisonParams(
-            referenceMoment,
+            refMoment,
             selectedOptionIds,
             comparisonOptionId
         );
     } else {
-        selectedOptions = customGetSelectedOptions(referenceMoment, selectedOptionIds);
+        selectedOptions = customGetSelectedOptions(refMoment, selectedOptionIds);
     }
     const minusParams = getMinusParams(selectedOptionIds);
     const yearOptions = selectedOptions.year;
@@ -325,7 +326,7 @@ export function customConstructDateDomain(
     const ranges = [];
     for (const yearOption of yearOptions) {
         const constructRangeParams = {
-            referenceMoment,
+            referenceMoment: refMoment,
             fieldName,
             fieldType,
             plusParam,
@@ -361,7 +362,7 @@ export function customConstructDateDomain(
     return {domain, description};
 }
 
-export function customGetPeriodOptions(referenceMoment) {
+export function customGetPeriodOptions(refMoment) {
     // Adapt when solution for moment is found...
     const options = [];
     const originalOptions = Object.values(CUSTOM_PERIOD_OPTIONS);
@@ -374,17 +375,17 @@ export function customGetPeriodOptions(referenceMoment) {
             case "week":
             case "day":
                 description = option.description.toString();
-                defaultYear = referenceMoment.set(option.setParam).year;
+                defaultYear = refMoment.set(option.setParam).year;
                 break;
             case "month":
             case "year": {
-                const date = referenceMoment.plus(option.plusParam);
+                const date = refMoment.plus(option.plusParam);
                 description = date.toFormat(option.format);
                 defaultYear = date.year;
                 break;
             }
         }
-        const setParam = customGetSetParam(option, referenceMoment);
+        const setParam = customGetSetParam(option, refMoment);
         options.push({id, groupNumber, description, defaultYear, setParam});
     }
     const periodOptions = [];
