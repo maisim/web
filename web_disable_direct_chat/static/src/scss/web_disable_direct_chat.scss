@@ -1,0 +1,62 @@
+/* Start a meeting button in Discuss sidebar */
+.o_DiscussSidebar_startAMeetingButton {
+    display: none !important;
+}
+
+/* + and gear buttons to add/edit channels in sidebar */
+.o_DiscussSidebarCategory_commandAdd {
+    display: none !important;
+}
+.o_DiscussSidebarCategory_commandView {
+    display: none !important;
+}
+
+/* New message button in systray */
+.o_MessagingMenu_newMessageButton {
+    display: none !important;
+}
+
+/* Direct Messages section in sidebar */
+.o_DiscussSidebar_categoryChat {
+    display: none !important;
+}
+
+/* Channels section in sidebar */
+.o_DiscussSidebar_categoryChannel {
+    display: none !important;
+}
+
+/* Mobile: Start a conversation button */
+.o_Discuss_mobileNewChatButton {
+    display: none !important;
+}
+
+/* Mobile: New channel button */
+.o_Discuss_mobileNewChannelButton {
+    display: none !important;
+}
+
+/* New message "To:" form in chat windows */
+.o_ChatWindow_newMessageForm {
+    display: none !important;
+}
+
+/* Call button in thread topbar */
+.o_ThreadViewTopbar_callButton {
+    display: none !important;
+}
+
+/* Invite button in thread topbar */
+.o_ThreadViewTopbar_inviteButton {
+    display: none !important;
+}
+
+/* Camera button in chat window header */
+.o_ChatWindowHeader_commandCamera {
+    display: none !important;
+}
+
+/* Phone button in chat window header */
+.o_ChatWindowHeader_commandPhone {
+    display: none !important;
+}
